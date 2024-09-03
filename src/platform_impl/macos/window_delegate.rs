@@ -11,8 +11,8 @@ use objc2::{declare_class, msg_send_id, mutability, sel, ClassType, DeclaredClas
 use objc2_app_kit::{
     NSAppKitVersionNumber, NSAppKitVersionNumber10_12, NSAppearance, NSApplication,
     NSApplicationPresentationOptions, NSBackingStoreType, NSDraggingDestination,
-    NSFilenamesPboardType, NSPasteboard, NSRequestUserAttentionType, NSScreen, NSView,
-    NSWindowButton, NSWindowDelegate, NSWindowFullScreenButton, NSWindowLevel,
+    NSFilenamesPboardType, NSPasteboard, NSPopUpMenuWindowLevel, NSRequestUserAttentionType,
+    NSScreen, NSView, NSWindowButton, NSWindowDelegate, NSWindowFullScreenButton, NSWindowLevel,
     NSWindowOcclusionState, NSWindowOrderingMode, NSWindowSharingType, NSWindowStyleMask,
     NSWindowTabbingMode, NSWindowTitleVisibility,
 };
@@ -521,6 +521,8 @@ fn new_window(
             masks |= NSWindowStyleMask::FullSizeContentView;
         }
 
+        masks |= NSWindowStyleMask::NonactivatingPanel;
+
         let window: Option<Retained<WinitWindow>> = unsafe {
             msg_send_id![
                 super(mtm.alloc().set_ivars(())),
@@ -722,7 +724,8 @@ impl WindowDelegate {
             delegate.set_max_inner_size(Some(dim));
         }
 
-        delegate.set_window_level(attrs.window_level);
+        delegate.window().setLevel(NSPopUpMenuWindowLevel);
+        //delegate.set_window_level(attrs.window_level);
 
         delegate.set_cursor(attrs.cursor);
 
@@ -1511,15 +1514,17 @@ impl WindowDelegate {
 
     #[inline]
     pub fn focus_window(&self) {
-        let mtm = MainThreadMarker::from(self);
-        let is_minimized = self.window().isMiniaturized();
-        let is_visible = self.window().isVisible();
+        // This circumvents nonactivating panel
 
-        if !is_minimized && is_visible {
-            #[allow(deprecated)]
-            NSApplication::sharedApplication(mtm).activateIgnoringOtherApps(true);
-            self.window().makeKeyAndOrderFront(None);
-        }
+        // let mtm = MainThreadMarker::from(self);
+        // let is_minimized = self.window().isMiniaturized();
+        // let is_visible = self.window().isVisible();
+
+        // if !is_minimized && is_visible {
+        //     #[allow(deprecated)]
+        //     NSApplication::sharedApplication(mtm).activateIgnoringOtherApps(true);
+        //     self.window().makeKeyAndOrderFront(None);
+        // }
     }
 
     #[inline]

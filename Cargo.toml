@@ -163,6 +163,8 @@ features = [
     "NSWindow",
     "NSWindowScripting",
     "NSWindowTabGroup",
+    "NSPanel",
+    "NSTrackingArea",
 ]
 
 [target.'cfg(target_os = "ios")'.dependencies.objc2-foundation]
